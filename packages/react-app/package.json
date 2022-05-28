@@ -39,6 +39,7 @@
     "bnc-notify": "^1.5.0",
     "burner-provider": "^1.0.38",
     "dotenv": "^8.2.0",
+    "eth-crypto": "^2.3.0",
     "eth-hooks": "^1.1.2",
     "ethers": "5.1.4",
     "graphiql": "^1.0.5",
