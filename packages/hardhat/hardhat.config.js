@@ -4,7 +4,7 @@ const chalk = require("chalk");
 
 require("@nomiclabs/hardhat-waffle");
 require("@tenderly/hardhat-tenderly")
-
+require('hardhat-abi-exporter');
 require("@nomiclabs/hardhat-etherscan");
 
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
