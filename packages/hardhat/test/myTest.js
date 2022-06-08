@@ -7,7 +7,8 @@ const { solidity } = require("ethereum-waffle");
 const { keccak256 } = require("@ethersproject/keccak256");
 const { getContractAt } = require("@nomiclabs/hardhat-ethers/dist/src/helpers");
 const contracts = require("../../react-app/src/contracts/contracts");
-//const walletABI = require("../../react-app/src/contracts/SmartWallet.abi");
+//using "hardhat-abi-exporter" package to publish abi to packages/hardhat/abi prior to
+//each deploy. To do this we call "hardhat clear-abi && hardhat export-abi" in the test command of package.json
 const walletABI = require("../abi/contracts/SmartWallet.sol/SmartWallet.json");
 const { call } = require("ramda");
 const { providers } = require("../../react-app/node_modules/ethers/lib");
@@ -28,7 +29,7 @@ describe("1271Wallet", function () {
     WalletFactory = await WalletFactory_contractFactory.deploy();
     //SmartWallet = await 
     //console.log("owner address: ", owner.address)
-    console.log("wallet factory: " + WalletFactory.address)
+    //console.log("wallet factory: " + WalletFactory.address)
     //salt method just for testing... evaluate proper implementation later
     //salt = keccak256(owner.address, WalletFactory.address);
 
@@ -55,7 +56,7 @@ describe("1271Wallet", function () {
     //the address of the newly deployed wallet will be the first paramater of the "Wallet Created" event
     let walletAddress = WALLET_CREATION.args[0];
     let wallet2Address = WALLET_CREATION2.args[0];
-      console.log("wallet address: " + walletAddress);
+      //console.log("wallet address: " + walletAddress);
     //connect to deployed contract instance using a signer ("owner") to allow read-write access
       // Read-Only; By connecting to a Provider, allows:
       // - Any constant function
@@ -90,20 +91,22 @@ describe("1271Wallet", function () {
       const magicValue = "0x1626ba7e";
 
       const message = "a simple message";
+
       const signature = await owner.signMessage(message)
       let verifiedAddress = ethers.utils.verifyMessage(message, signature);
-  
+      const hash = ethers.utils.hashMessage(message);
+      let walletOwner = await wallet.owner();
       expect(verifiedAddress).to.equal(owner.address);
-
-      console.log("is msg bytes? ", ethers.utils.isBytes(message));
-      //const result = await wallet.methods.isValidSignature(data, signature).call()
+      expect(walletOwner).to.equal(owner.address);
+      let validityCheck = await wallet.isValidSignature(hash, signature);
       
-      //let tx = await wallet.isValidSignature(data, signature);
-      let ownerQuery = await wallet.owner();
       // Wait for one block confirmation. The transaction has been mined at this point.
       //let receipt = await tx.wait();
+      console.log("tx: ", validityCheck)
       
-    //console.log("wallet.owner() call: " + ownerQuery, ", expected owner: " + owner.address, "isValidSignature: " + tx)
+    console.log("wallet.owner() call: " + walletOwner, ", expected owner: " + owner.address, "isValidSignature: " + validityCheck)
+    expect(validityCheck).to.equal(magicValue);
+    
     });
 
   });
