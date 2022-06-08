@@ -37,7 +37,8 @@ contract SmartWallet is Initializable {
     // );
     //should return bytes4
     // Validate signatures
-    if (ECDSA.recover(_hash, _signature) == owner) {
+    address recovered = ECDSA.recover(_hash, _signature);
+    if (recovered == owner) {
       return 0x1626ba7e;
     } else {
       // return ECDSA.recover(_hash, _signature);
