@@ -1,4 +1,6 @@
-const { ethers } = require("hardhat");
+//const { ethers } = require("hardhat");
+const { ethers } = require("ethers");
+require("@nomiclabs/hardhat-waffle");
 const fs = require('fs');
 const { use, expect } = require("chai");
 const { solidity } = require("ethereum-waffle");
@@ -9,15 +11,19 @@ const contracts = require("../../react-app/src/contracts/contracts");
 const walletABI = require("../abi/contracts/SmartWallet.sol/SmartWallet.json");
 const { call } = require("ramda");
 const { providers } = require("../../react-app/node_modules/ethers/lib");
+const { Signer } = require("crypto");
+const { SignerWithAddress } = require("@nomiclabs/hardhat-ethers/dist/src/signer-with-address");
+const { isHexString } = require("@ethersproject/bytes");
+//const { Signer } = require("crypto");
 use(solidity);
 
 describe("1271Wallet", function () {
   let WalletFactory, WalletFactory_contractFactory, wallet, wallet2, owner, addr1, addr2;
 
   beforeEach(async function () {
-    WalletFactory_contractFactory = await ethers.getContractFactory("WalletFactory");
-    SmartWallet_contractFactory = await ethers.getContractFactory("SmartWallet");
-     [owner, addr1, addr2] = await ethers.getSigners();
+    WalletFactory_contractFactory = await hre.ethers.getContractFactory("WalletFactory");
+    SmartWallet_contractFactory = await hre.ethers.getContractFactory("SmartWallet");
+     [owner, addr1, addr2] = await hre.ethers.getSigners();
 
     WalletFactory = await WalletFactory_contractFactory.deploy();
     //SmartWallet = await 
@@ -64,7 +70,7 @@ describe("1271Wallet", function () {
       // - Sending transactions for non-constant functions
     wallet = new ethers.Contract(walletAddress, walletABI, owner);
     wallet2 = new ethers.Contract(wallet2Address, walletABI, addr1);
-    console.log(wallet)
+    //console.log(wallet)
   });
 
   describe("Deployment()", function () {
@@ -80,53 +86,24 @@ describe("1271Wallet", function () {
   describe("1271Wallet", function () {
     
     it("Should return the correct magic value when isValidSignature is called correctly", async function () {
-      // const arbitrarySignature =
-      // "0xc531a1d9046945d3732c73d049da2810470c3b0663788dca9e9f329a35c8a0d56add77ed5ea610b36140641860d13849abab295ca46c350f50731843c6517eee1c";
-      // const arbitrarySignatureHash = soliditySha3({
-      //   t: "bytes",
-      //   v: arbitrarySignature,
-      // });
-      // const arbitraryMsgHash =
-      //   "0xec4870a1ebdcfbc1cc84b0f5a30aac48ed8f17973e0189abdb939502e1948238";
   
       const magicValue = "0x1626ba7e";
-      // const msgHash = ethers.utils.hashMessage("Hello World");
-      let randomSigner = ethers.Wallet.createRandom();
-      //[owner, addr1, addr2] = await ethers.getSigners();
-      const hash = ethers.utils.keccak256(owner.address)
-      let flatSig = await randomSigner.signMessage(ethers.utils.arrayify(hash));
-      //const msg = await owner.signMessage("hellow world")
-      //let tx = wallet.isValidSignature()
-      let recovered = ethers.utils.recoverAddress(hash, flatSig)
-      //expect(owner.address.to.equal(recovered))
-      //console.log(randomSigner.address, recovered)
-      // //const [adminWallet, userWallet] = await ethers.getSigners();
-      // const timestamp = Date.now();
 
-      // // STEP 1:
-      // // building hash has to come from system address
-      // // 32 bytes of data
-      // let messageHash = ethers.utils.solidityKeccak256(
-      //     ["address", "uint"],
-      //     [owner.address, timestamp]
-      // );
+      const message = "a simple message";
+      const signature = await owner.signMessage(message)
+      let verifiedAddress = ethers.utils.verifyMessage(message, signature);
+  
+      expect(verifiedAddress).to.equal(owner.address);
 
-      // // STEP 2: 32 bytes of data in Uint8Array
-      // let messageHashBinary = ethers.utils.arrayify(messageHash);
-
-      // // STEP 3: To sign the 32 bytes of data, make sure you pass in the data
-      // let signature = await owner.signMessage(messageHashBinary);
-      //const account = '0x99bd0006D13542A0917Cf8F2F986Ca7667b84268'
-      const data = '0x47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad'
-      const signature = '0x0304494527023df3a811f5ad61aa35177a4455eb4bf098561f9380a574915f4c1ff4a5fc653afdfc086dcc9662848097703d18b82156618ccec1e5c9da7623e51b4760269d07f9a074dc2d6ab10cf52ff77852662e40fbb4b27289126a5bb538271e147c0952204161d710bb070a6e470b0b1ef65d11f1dc074e235e3dfaef00ae1b'
-
+      console.log("is msg bytes? ", ethers.utils.isBytes(message));
       //const result = await wallet.methods.isValidSignature(data, signature).call()
-      let tx = await wallet.isValidSignature(data, signature);
+      
+      //let tx = await wallet.isValidSignature(data, signature);
       let ownerQuery = await wallet.owner();
       // Wait for one block confirmation. The transaction has been mined at this point.
       //let receipt = await tx.wait();
       
-    console.log("wallet.owner() call: " + ownerQuery, ", expected owner: " + owner.address, "isValidSignature: " + tx)
+    //console.log("wallet.owner() call: " + ownerQuery, ", expected owner: " + owner.address, "isValidSignature: " + tx)
     });
 
   });
