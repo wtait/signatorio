@@ -19,9 +19,13 @@ const { isHexString } = require("@ethersproject/bytes");
 use(solidity);
 
 describe("1271Wallet", function () {
-  let WalletFactory, WalletFactory_contractFactory, wallet, wallet2, owner, addr1, addr2;
+  let WalletFactory, WalletFactory_contractFactory, wallet, wallet2, owner, addr1, addr2, arbitraryMsgHash, arbitrarySignature;
 
   beforeEach(async function () {
+  arbitrarySignature =
+  "0xc531a1d9046945d3732c73d049da2810470c3b0663788dca9e9f329a35c8a0d56add77ed5ea610b36140641860d13849abab295ca46c350f50731843c6517eee1c";
+  arbitraryMsgHash =
+  "0xec4870a1ebdcfbc1cc84b0f5a30aac48ed8f17973e0189abdb939502e1948238";
     WalletFactory_contractFactory = await hre.ethers.getContractFactory("WalletFactory");
     SmartWallet_contractFactory = await hre.ethers.getContractFactory("SmartWallet");
      [owner, addr1, addr2] = await hre.ethers.getSigners();
@@ -107,6 +111,12 @@ describe("1271Wallet", function () {
     console.log("wallet.owner() call: " + walletOwner, ", expected owner: " + owner.address, "isValidSignature: " + validityCheck)
     expect(validityCheck).to.equal(magicValue);
     
+    });
+
+    it("should revert for invalid signatures", async () => {
+      await expect(
+        wallet.isValidSignature(arbitraryMsgHash, arbitrarySignature)
+      ).to.be.revertedWith("the recovered address is not the registered owner of this wallet");
     });
 
   });
