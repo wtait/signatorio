@@ -15,28 +15,30 @@ const  arbitraryMsgHash =
 const arbitrarySalt = 
   '0x0000000000000000000000000000000000000000000000000000000000000001'; //salt method just for testing... evaluate proper implementation later
 
+const arbitrarySalt2 = 
+  '0x0000000000000000000000000000000000000000000000000000000000000002';
+
 const message = "a simple message";
 
-let WalletFactory, WalletFactory_contractFactory, wallet, alice, signature, hash;
+let WalletFactory, WalletFactory_Deployer, wallet, alice, aliceWallet, walletDeployTransaction, signature, hash, events;
 
 beforeEach(async () => {
-  WalletFactory_contractFactory = await ethers.getContractFactory("WalletFactory");
-  SmartWallet_contractFactory = await ethers.getContractFactory("SmartWallet");
+  WalletFactory_Deployer = await ethers.getContractFactory("WalletFactory");
+  SmartWallet_Deployer = await ethers.getContractFactory("SmartWallet");
   [alice] = await ethers.getSigners();
-  WalletFactory = await WalletFactory_contractFactory.deploy();
+  WalletFactory = await WalletFactory_Deployer.deploy();
 
   // Submit the transaction and wait for it to be added to current block's pending transactions
-  let aliceWallet = await WalletFactory.createWallet(arbitrarySalt, alice.address, {from: alice.address});
+  aliceWallet = await WalletFactory.createWallet(arbitrarySalt, alice.address, {from: alice.address});
 
   // Wait for one block confirmation. The transaction has been mined at this point.
-  const receipt = await aliceWallet.wait();
+  walletDeployTransaction = await aliceWallet.wait();
 
   // Get the events emitted when the aliceWallet is created
-  const events = receipt?.events // # => Event[] | undefined
+  events = walletDeployTransaction?.events // # => Event[] | undefined
 
-  //filter events
-  let WALLET_CREATION = events.find(
-    event => event.event == 'WalletCreated');
+  let WALLET_CREATION =  events.find(
+    item => item.event == 'WalletCreated');
 
   //the address of the newly deployed wallet will be the first paramater of the "Wallet Created" event
   let walletAddress = WALLET_CREATION.args[0];
@@ -54,6 +56,14 @@ describe("1271Wallet", () => {
   describe("Signature Methods", () => {
     it("Should utilize a valid signing method", async () => {
       expect(ethers.utils.verifyMessage(message, signature)).to.equal(alice.address);
+    })
+    it("Should produce a correctly formatted data hash", async () => {
+      expect(ethers.utils.isBytesLike(hash)).to.be.true;
+      expect(ethers.utils.arrayify(hash).length).to.equal(32);
+    })
+    it("Should produce a correctly formatted signature", async () => {
+      expect(ethers.utils.isBytesLike(signature)).to.be.true;
+      expect(ethers.utils.arrayify(signature).length).to.equal(65);
     })
   })
 
