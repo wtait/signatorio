@@ -1,13 +1,10 @@
 pragma solidity >=0.6.0 <0.9.0;
 //SPDX-License-Identifier: MIT
 
-// import "hardhat/console.sol";
 import "@openzeppelin/contracts/cryptography/ECDSA.sol";
 import '@openzeppelin/contracts/proxy/Initializable.sol';
 
 contract SmartWallet is Initializable {
-
-  using ECDSA for bytes32;
 
   address payable public owner;
 
@@ -35,13 +32,10 @@ contract SmartWallet is Initializable {
     //   signer != address(0x0),
     //   "SignatureValidator#recoverSigner: INVALID_SIGNER"
     // );
-    //should return bytes4
-    // Validate signatures
     address recovered = ECDSA.recover(_hash, _signature);
     if (recovered == owner) {
       return 0x1626ba7e;
     } else {
-      // return ECDSA.recover(_hash, _signature);
       revert("the recovered address is not the registered owner of this wallet");
     }
 
