@@ -1,5 +1,4 @@
-//const { ethers } = require("hardhat");
-const { ethers } = require("ethers");
+const { ethers } = require("hardhat");
 require("@nomiclabs/hardhat-waffle");
 const fs = require('fs');
 const { use, expect } = require("chai");
@@ -26,9 +25,9 @@ describe("1271Wallet", function () {
   "0xc531a1d9046945d3732c73d049da2810470c3b0663788dca9e9f329a35c8a0d56add77ed5ea610b36140641860d13849abab295ca46c350f50731843c6517eee1c";
   arbitraryMsgHash =
   "0xec4870a1ebdcfbc1cc84b0f5a30aac48ed8f17973e0189abdb939502e1948238";
-    WalletFactory_contractFactory = await hre.ethers.getContractFactory("WalletFactory");
-    SmartWallet_contractFactory = await hre.ethers.getContractFactory("SmartWallet");
-     [owner, addr1, addr2] = await hre.ethers.getSigners();
+    WalletFactory_contractFactory = await ethers.getContractFactory("WalletFactory");
+    SmartWallet_contractFactory = await ethers.getContractFactory("SmartWallet");
+     [owner, addr1, addr2] = await ethers.getSigners();
 
     WalletFactory = await WalletFactory_contractFactory.deploy();
     //SmartWallet = await 
@@ -75,7 +74,6 @@ describe("1271Wallet", function () {
       // - Sending transactions for non-constant functions
     wallet = new ethers.Contract(walletAddress, walletABI, owner);
     wallet2 = new ethers.Contract(wallet2Address, walletABI, addr1);
-    //console.log(wallet)
   });
 
   describe("Deployment()", function () {
