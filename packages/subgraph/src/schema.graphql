@@ -1,15 +1,28 @@
-type Purpose @entity {
+# type Purpose @entity {
+#   id: ID!
+#   sender: Sender!
+#   purpose: String!
+#   createdAt: BigInt!
+#   transactionHash: String!
+# }
+
+type Wallet @entity {
   id: ID!
-  sender: Sender!
-  purpose: String!
+  owner: Owner!
+  address: Bytes!
   createdAt: BigInt!
   transactionHash: String!
 }
 
-type Sender @entity {
+type Owner @entity {
   id: ID!
-  address: Bytes!
-  purposes: [Purpose!] @derivedFrom(field: "sender")
-  createdAt: BigInt!
-  purposeCount: BigInt!
+  wallets: [Wallet!] @derivedFrom(field: "owner")
 }
+
+# type Sender @entity {
+#   id: ID!
+#   address: Bytes!
+#   purposes: [Purpose!] @derivedFrom(field: "sender")
+#   createdAt: BigInt!
+#   purposeCount: BigInt!
+# }
