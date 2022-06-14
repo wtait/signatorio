@@ -8,14 +8,15 @@
 
 type Wallet @entity {
   id: ID!
-  owner: Owner!
-  address: Bytes!
-  createdAt: BigInt!
-  transactionHash: String!
+  owner: Owner
+  address: Bytes
+  createdAt: BigInt
+  transactionHash: String
 }
 
 type Owner @entity {
   id: ID!
+  address: Bytes
   wallets: [Wallet!] @derivedFrom(field: "owner")
 }
 

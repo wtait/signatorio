@@ -33,10 +33,11 @@ export function handleWalletCreated(event: WalletCreated): void {
 
   if(owner == null) {
     owner = new Owner(ownerAddress)
+    owner.address = event.params._Owner
   }
 
-  let wallet = new Wallet(event.params._Wallet.toHex() + "-" + event.transaction.hash.toHex())
-  wallet.owner = event.params._Owner.toHex()
+  let wallet = new Wallet(event.params._Wallet.toHex() + "-" + ownerAddress);
+  wallet.owner = ownerAddress;
   wallet.address = event.params._Wallet
   wallet.createdAt = event.block.timestamp
   wallet.transactionHash = event.transaction.hash.toHex()

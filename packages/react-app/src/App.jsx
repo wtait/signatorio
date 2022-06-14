@@ -27,7 +27,7 @@ const { Footer } = Layout;
 
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.mainnet; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -175,7 +175,9 @@ function App() {
 
     const abi = require("../src/contracts/WalletFactory.abi");
     // const Bytecode = require("../src/contracts/WalletContract.bytecode");
-    const walletFactoryAddress = '0x450f5D3abD4e3bf3580205E085d27d3564285e75'; //deployed address on kovan
+    //NEED TO LOAD THIS DYNAMICALLY!!
+      //currently hardcoded based transaction data emitted on command line for local hardhat network
+    const walletFactoryAddress = '0x5fbdb2315678afecb367f032d93f642f64180aa3'; //deployed address on kovan
     let WalletFactory = new ethers.Contract(walletFactoryAddress, abi, signer);
 
     // Deployment is asynchronous, so we use an async IIFE
