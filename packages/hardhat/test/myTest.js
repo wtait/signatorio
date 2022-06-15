@@ -3,6 +3,17 @@ const { expect } = require("chai");
 //using "hardhat-abi-exporter" package to publish abi to packages/hardhat/abi prior to
 //each deploy. To do this we call "hardhat clear-abi && hardhat export-abi" in the test command of package.json
 const walletABI = require("../abi/contracts/SmartWallet.sol/SmartWallet.json");
+const { keccak256 } = require("@ethersproject/keccak256");
+
+
+
+// let testSalt = ethers.utils.randomBytes(32)
+// testSalt = keccak256(testSalt)
+// console.log(testSalt)
+
+const getSalt = () => {
+  return keccak256(ethers.utils.randomBytes(32))
+}
 
 const magicValue = "0x1626ba7e";
 
@@ -12,11 +23,11 @@ const  arbitrarySignature =
 const  arbitraryMsgHash =
   "0xec4870a1ebdcfbc1cc84b0f5a30aac48ed8f17973e0189abdb939502e1948238";
 
-const arbitrarySalt = 
-  '0x0000000000000000000000000000000000000000000000000000000000000001'; //salt method just for testing... evaluate proper implementation later
+const arbitrarySalt = getSalt()
 
-const arbitrarySalt2 = 
-  '0x0000000000000000000000000000000000000000000000000000000000000002';
+  // '0x0000000000000000000000000000000000000000000000000000000000000001'; //salt method just for testing... evaluate proper implementation later
+// const arbitrarySalt2 = 
+//   '0x0000000000000000000000000000000000000000000000000000000000000002';
 
 const message = "a simple message";
 

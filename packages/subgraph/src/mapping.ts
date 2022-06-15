@@ -7,7 +7,7 @@ import {
 //   WalletFactory
 // } from "../generated/WalletFactory/WalletFactory"
 
-import { Wallet, Owner } from "../generated/schema"
+import { Wallet, Owner, WalletFactory } from "../generated/schema"
 
 
 export function handleWalletCreated(event: WalletCreated): void {
@@ -41,9 +41,19 @@ export function handleWalletCreated(event: WalletCreated): void {
   wallet.address = event.params._Wallet
   wallet.createdAt = event.block.timestamp
   wallet.transactionHash = event.transaction.hash.toHex()
+  wallet.walletFactory = event.address.toHexString()
 
+  let walletFactory = WalletFactory.load(wallet.walletFactory)
+
+  if (walletFactory == null) {
+    walletFactory = new WalletFactory(event.address.toHexString())
+    walletFactory.address = event.address
+  }
+
+  
   owner.save()
   wallet.save()
+  walletFactory.save()
 
 }
 

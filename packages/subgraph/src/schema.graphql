@@ -9,6 +9,7 @@
 type Wallet @entity {
   id: ID!
   owner: Owner
+  walletFactory: WalletFactory
   address: Bytes
   createdAt: BigInt
   transactionHash: String
@@ -18,6 +19,12 @@ type Owner @entity {
   id: ID!
   address: Bytes
   wallets: [Wallet!] @derivedFrom(field: "owner")
+}
+
+type WalletFactory @entity {
+  id: ID!
+  address: Bytes
+  wallets: [Wallet!] @derivedFrom(field: "walletFactory")
 }
 
 # type Sender @entity {

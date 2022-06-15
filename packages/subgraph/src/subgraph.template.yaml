@@ -16,6 +16,7 @@ dataSources:
       entities:
         - Wallet
         - Owner
+        - WalletFactory
       abis:
         - name: WalletFactory
           file: ./abis/WalletFactory.json
