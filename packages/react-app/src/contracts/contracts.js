@@ -1,1 +1,1 @@
-module.exports = ["SmartWallet"];
+module.exports = ["WalletFactory"];

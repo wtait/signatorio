@@ -3,23 +3,24 @@ schema:
   file: ./src/schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: YourContract
+    name: WalletFactory
     network: localhost
     source:
-      address: '{{YourContractAddress}}'
-      abi: YourContract
+      address: "{{WalletFactoryAddress}}"
+      abi: WalletFactory
       startBlock: 1
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Purpose
-        - Sender
+        - Wallet
+        - Owner
+        - WalletFactory
       abis:
-        - name: YourContract
-          file: ./abis/YourContract.json
+        - name: WalletFactory
+          file: ./abis/WalletFactory.json
       eventHandlers:
-        - event: SetPurpose(address,string)
-          handler: handleSetPurpose
+        - event: WalletCreated(indexed address,indexed address,indexed address)
+          handler: handleWalletCreated
       file: ./src/mapping.ts

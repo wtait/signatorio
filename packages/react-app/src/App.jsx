@@ -27,7 +27,7 @@ const { Footer } = Layout;
 
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.mainnet; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -88,7 +88,6 @@ function App() {
 
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const address = useUserAddress(injectedProvider);
-
 
 
   const simpleSignature = async () => {
@@ -156,44 +155,57 @@ function App() {
 
  const deployWallet = async () => {
     //deployment works. 
-    //now need to have a factory contract that:
+    //now need to have a factory contract that inherits create2:
       // deploys the wallet
       // initiates wallet by transferring ownership from the factory to the itended owner (caller)
+
       // emits an event upon initialization so that the subgraph can feed the event to the frontend.
       // when frontend detects that the signer() has an associated wallet it will replace the "new wallet" button with a wallet detail widget (show contract address and link to details page)
-
+      
 
     // Connect to the network
-    //let provider = ethers.getDefaultProvider('ropsten');
+    let provider = ethers.getDefaultProvider('kovan');
+    const signer = injectedProvider.getSigner();
 
     // Load the wallet to deploy the contract with
     // let privateKey = '0x0123456789012345678901234567890123456789012345678901234567890123';
     // let wallet = new ethers.Wallet(privateKey, provider);
-    const deployer = injectedProvider.getSigner();
-    const walletABI = require("../src/contracts/SmartWallet.abi");
-    const walletBytecode = require("../src/contracts/SmartWallet.bytecode");
+    const arbitrarySalt = 
+    '0x0000000000000000000000000000000000000000000000000000000000000001'; //salt method just for testing... evaluate proper implementation later
+
+    const abi = require("../src/contracts/WalletFactory.abi");
+    // const Bytecode = require("../src/contracts/WalletContract.bytecode");
+    //NEED TO LOAD THIS DYNAMICALLY!!
+      //currently hardcoded based transaction data emitted on command line for local hardhat network
+    const walletFactoryAddress = '0x5fbdb2315678afecb367f032d93f642f64180aa3'; //deployed address on kovan
+    let WalletFactory = new ethers.Contract(walletFactoryAddress, abi, signer);
 
     // Deployment is asynchronous, so we use an async IIFE
     (async function() {
+      // const deployer = injectedProvider.getSigner();
+      // let walletFactoryInstance = ethers.Contract.connect(signer);
 
+      // let WalletFactory = ethers.Contract.attach(walletFactoryAddress);
+
+      let wallet = await WalletFactory.createWallet(arbitrarySalt, address);
         // Create an instance of a Contract Factory
-        let factory = new ethers.ContractFactory(walletABI, walletBytecode, deployer);
+        // let factory = new ethers.ContractFactory(walletABI, walletBytecode, deployer);
 
         // Notice we pass in "Hello World" as the parameter to the constructor
-        let contract = await factory.deploy();
+        // let contract = await factory.deploy();
 
         // The address the Contract WILL have once mined
         // See: https://ropsten.etherscan.io/address/0x2bd9aaa2953f988153c8629926d22a6a5f69b14e
-        console.log("deploying contract at address: ", contract.address);
+        console.log("deploying wallet: ", wallet);
         // "0x2bD9aAa2953F988153c8629926D22A6a5F69b14E"
 
         // The transaction that was sent to the network to deploy the Contract
         // See: https://ropsten.etherscan.io/tx/0x159b76843662a15bd67e482dcfbee55e8e44efad26c5a614245e12a00d4b1a51
-        console.log("contract has been deployed. deployment hash is: ", contract.deployTransaction.hash);
+        // console.log("contract has been deployed. deployment hash is: ", contract.deployTransaction.hash);
         // "0x159b76843662a15bd67e482dcfbee55e8e44efad26c5a614245e12a00d4b1a51"
 
         // The contract is NOT deployed yet; we must wait until it is mined
-        await contract.deployed()
+        // await contract.deployed()
 
         // Done! The contract is deployed.
     })();
